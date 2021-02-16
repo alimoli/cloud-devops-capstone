@@ -55,8 +55,8 @@ jobs:
           command: |
             yarn build
       - save_cache:
-          paths: [node_modules, build]
-          key: react-${CIRCLE_WORKFLOW_ID}
+          paths: [build]
+          key: react-build-${CIRCLE_WORKFLOW_ID}
 
   # Dockerize react application
   dockerize:
@@ -65,7 +65,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-${CIRCLE_WORKFLOW_ID}
+            - react-build-${CIRCLE_WORKFLOW_ID}
       - run:
           name: Login to the registry
           command: |
