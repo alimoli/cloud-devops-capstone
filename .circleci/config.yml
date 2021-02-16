@@ -1,25 +1,91 @@
-name: CI
-
-on: [push]
+version: 2.1
 
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-18.04
-    strategy:
-      matrix:
-        node_version: [14]
 
+  # Install dependencies using yarn
+  deps:
+    docker:
+      - image: circleci/node:13.8.0
     steps:
-      - uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v1
-        with:
-          node_version: ${{ matrix.node_version }}
+      - checkout
+      - restore_cache:
+          keys:
+            - react-${CIRCLE_WORKFLOW_ID}
+      - run:
+          name: Install yarn
+          command: |
+            npm install -g yarn
+      - run:
+          name: Install dependencies
+          command: |
+            yarn install
+      - save_cache:
+          paths: [node_modules]
+          key: react-${CIRCLE_WORKFLOW_ID}
 
-      - name: Run CI
-        run: |
-          yarn install
-          yarn lint
-          yarn test
-          yarn build
+  # Check code quality
+  check:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - react-${CIRCLE_WORKFLOW_ID}
+      - run:
+          name: Lint code
+          command: |
+            yarn lint
+      - run:
+          name: Test code
+          command: |
+            yarn test
+
+  # Install dependencies using yarn
+  build:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - react-${CIRCLE_WORKFLOW_ID}
+      - run:
+          name: Build react app
+          command: |
+            yarn build
+      - save_cache:
+          paths: [node_modules, build]
+          key: react-${CIRCLE_WORKFLOW_ID}
+
+  # Dockerize react application
+  dockerize:
+    machine: true
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - react-${CIRCLE_WORKFLOW_ID}
+      - run:
+          name: Login to the registry
+          command: |
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run:
+          name: Build docker image
+          command: |
+            docker build -t limoli/capstone:$CIRCLE_BRANCH .
+      - run:
+          name: Deploy docker image
+          command: |
+            docker push limoli/capstone:$CIRCLE_BRANCH
+
+workflows:
+  default:
+    jobs:
+      - deps
+      - check:
+          requires: [deps]
+      - build:
+          requires: [check]
+      - dockerize:
+          requires: [build]
