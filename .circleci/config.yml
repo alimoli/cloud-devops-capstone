@@ -78,6 +78,7 @@ jobs:
           name: Login to the registry
           command: |
             echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            cp -R .docker /tmp
       - run:
           name: Build docker image
           command: |
