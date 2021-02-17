@@ -72,6 +72,8 @@ jobs:
     machine: true
     steps:
       - checkout
+      - attach_workspace:
+          at: /tmp
       - run:
           name: Login to the registry
           command: |
@@ -79,6 +81,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
+            tar -xf /tmp/build.tar.gz build
             docker build -t limoli/capstone:$CIRCLE_BRANCH .
       - run:
           name: Deploy docker image
