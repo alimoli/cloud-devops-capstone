@@ -81,8 +81,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            tar -xf build /tmp/build.tar.gz
-            ls -la
+            tar -xf /tmp/build.tar.gz build
             docker build -t limoli/capstone:$CIRCLE_BRANCH .
       - run:
           name: Deploy docker image
