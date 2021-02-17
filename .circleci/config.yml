@@ -98,13 +98,6 @@ jobs:
           name: Test cluster
           command: |
             kubectl get services
-
-  deploy:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - checkout
-      - kubernetes/install-kubectl
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: deploy/prod.yml
@@ -121,8 +114,6 @@ workflows:
           requires: [check]
       - dockerize:
           requires: [build]
-      - test-cluster:
+      - deploy:
           cluster-name: prod
           requires: [dockerize]
-      - deploy:
-          requires: [test-cluster]
