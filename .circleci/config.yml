@@ -19,10 +19,12 @@ jobs:
           name: Install yarn
           command: |
             npm install yarn --no-package-lock
+            ls -la
       - run:
           name: Install dependencies using yarn
           command: |
-            yarn install --frozen-lockfile
+            yarn install --immutable
+            ls -la
       - save_cache:
           paths: [node_modules]
           key: deps-{{ checksum "yarn.lock" }}
