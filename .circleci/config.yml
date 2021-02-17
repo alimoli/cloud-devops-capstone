@@ -83,7 +83,7 @@ jobs:
           command: |
             docker push limoli/capstone:$CIRCLE_BRANCH
 
-  test-cluster:
+  deploy:
     executor: aws-eks/python3
     parameters:
       cluster-name:
