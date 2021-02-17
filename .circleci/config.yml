@@ -1,5 +1,9 @@
 version: 2.1
 
+orbs:
+  aws-eks: circleci/aws-eks@1.0.0
+  kubernetes: circleci/kubernetes@0.11.2
+
 jobs:
 
   # Install dependencies using yarn
@@ -79,6 +83,34 @@ jobs:
           command: |
             docker push limoli/capstone:$CIRCLE_BRANCH
 
+  test-cluster:
+    executor: aws-eks/python3
+    parameters:
+      cluster-name:
+        description: |
+          Name of the EKS cluster
+        type: string
+    steps:
+      - kubernetes/install
+      - aws-eks/update-kubeconfig-with-authenticator:
+          cluster-name: << parameters.cluster-name >>
+      - run:
+          name: Test cluster
+          command: |
+            kubectl get services
+
+  deploy:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - kubernetes/install-kubectl
+      - kubernetes/create-or-update-resource:
+          get-rollout-status: true
+          resource-file-path: deploy/prod.yml
+          resource-name: deployment/react-app
+          show-kubectl-command: true
+
 workflows:
   default:
     jobs:
@@ -89,3 +121,8 @@ workflows:
           requires: [check]
       - dockerize:
           requires: [build]
+      - test-cluster:
+          cluster-name: prod
+          requires: [dockerize]
+      - deploy:
+          requires: [test-cluster]
