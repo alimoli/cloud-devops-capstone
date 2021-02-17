@@ -120,3 +120,7 @@ workflows:
       - deploy:
           cluster-name: prod
           requires: [dockerize]
+          filters:
+            branches:
+              only: [main]
+

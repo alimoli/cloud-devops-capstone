@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: react-app
-          image: limoli/capstone
+          image: limoli/capstone:main
           imagePullPolicy: Always
           ports:
             - containerPort: 80
