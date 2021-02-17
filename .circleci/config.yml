@@ -107,9 +107,13 @@ jobs:
           command: |
             kubectl get services
       - run:
+          name: Check presence of docker config
+          command: |
+            ls -la ~
+      - run:
           command: |
             kubectl create secret generic regcred \
-            --from-file=.dockerconfigjson=.docker/config.json \
+            --from-file=.dockerconfigjson=~/.docker/config.json \
             --type=kubernetes.io/dockerconfigjson
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
