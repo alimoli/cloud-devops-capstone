@@ -14,7 +14,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-$CIRCLE_WORKFLOW_ID
+            - deps-{{ checksum "yarn.lock" }}
       - run:
           name: Install yarn
           command: |
@@ -25,7 +25,7 @@ jobs:
             yarn install
       - save_cache:
           paths: [node_modules]
-          key: react-$CIRCLE_WORKFLOW_ID
+          key: deps-{{ checksum "yarn.lock" }}
 
   # Check code quality
   check:
@@ -33,9 +33,17 @@ jobs:
       - image: circleci/node:12.16.0
     steps:
       - checkout
+      - run:
+          name: DEBUG - BEFORE Cache restore
+          command: |
+            ls -la
       - restore_cache:
           keys:
-            - react-$CIRCLE_WORKFLOW_ID
+            - deps-{{ checksum "yarn.lock" }}
+      - run:
+          name: DEBUG - AFTER Cache restore
+          command: |
+            ls -la
       - run:
           name: Lint code
           command: |
@@ -53,7 +61,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-$CIRCLE_WORKFLOW_ID
+            - deps-{{ checksum "yarn.lock" }}
       - run:
           name: Build react app
           command: |
