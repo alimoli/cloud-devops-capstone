@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   aws-eks: circleci/aws-eks@1.0.0
+  node: circleci/node@12.16.0
   kubernetes: circleci/kubernetes@0.11.2
 
 jobs:
@@ -15,14 +16,12 @@ jobs:
       - restore_cache:
           keys:
             - deps-{{ checksum "yarn.lock" }}
-      - run:
-          name: Install yarn
-          command: |
-            npm install yarn
-      - run:
-          name: Install dependencies
-          command: |
-            yarn install --frozen-lockfile
+      - node/install:
+          install-npm: false
+          install-yarn: true
+      - node/install-packages:
+          pkg-manager: yarn
+          with-cache: false # just to test "manual" cache
       - save_cache:
           paths: [node_modules]
           key: deps-{{ checksum "yarn.lock" }}
