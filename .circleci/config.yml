@@ -73,7 +73,8 @@ jobs:
       - run:
           name: Login to the registry
           command: |
-            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin && \
+            ls -la $HOME/.docker
       - run:
           name: Build docker image
           command: |
@@ -83,7 +84,7 @@ jobs:
           command: |
             docker push limoli/capstone:$CIRCLE_BRANCH
       - save_cache:
-          paths: [~/.docker]
+          paths: [$HOME/.docker]
           key: docker-${CIRCLE_WORKFLOW_ID}
 
   # Deploy to K8S cluster
@@ -109,11 +110,11 @@ jobs:
       - run:
           name: Check presence of docker config
           command: |
-            ls -la ~
+            ls -la $HOME
       - run:
           command: |
             kubectl create secret generic regcred \
-            --from-file=.dockerconfigjson=~/.docker/config.json \
+            --from-file=.dockerconfigjson=$HOME/.docker/config.json \
             --type=kubernetes.io/dockerconfigjson
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
