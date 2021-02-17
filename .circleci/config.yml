@@ -72,26 +72,18 @@ jobs:
     machine: true
     steps:
       - checkout
-      - attach_workspace:
-          at: /tmp
       - run:
           name: Login to the registry
           command: |
             echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
-            cp -R $HOME/.docker /tmp
       - run:
           name: Build docker image
           command: |
-            tar -xf /tmp/build.tar.gz build
             docker build -t limoli/capstone:$CIRCLE_BRANCH .
       - run:
           name: Deploy docker image
           command: |
             docker push limoli/capstone:$CIRCLE_BRANCH
-      - persist_to_workspace:
-          root: /tmp
-          paths:
-            - .docker
 
   # Deploy to K8S cluster
   deploy:
@@ -103,24 +95,9 @@ jobs:
         type: string
     steps:
       - checkout
-      - attach_workspace:
-          at: /tmp
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
-      - run:
-          name: Test cluster
-          command: |
-            kubectl get services
-      - run:
-          name: Check presence of docker config
-          command: |
-            ls -la $HOME
-      - run:
-          command: |
-            kubectl create secret generic regcred \
-            --from-file=.dockerconfigjson=/tmp/.docker/config.json \
-            --type=kubernetes.io/dockerconfigjson
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
           resource-file-path: deploy/prod.yml

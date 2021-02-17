@@ -9,3 +9,8 @@ eksctl create cluster \
 --nodes-max 3 \
 --ssh-access \
 --ssh-public-key=udacity
+
+# Create secret with docker configuration
+kubectl create secret generic regcred \
+--from-file=.dockerconfigjson=/tmp/.docker/config.json \
+--type=kubernetes.io/dockerconfigjson
