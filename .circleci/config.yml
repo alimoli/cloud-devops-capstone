@@ -19,12 +19,10 @@ jobs:
           name: Install yarn
           command: |
             npm install yarn --no-package-lock
-            ls -la
       - run:
           name: Install dependencies using yarn
           command: |
             yarn install --immutable
-            ls -la
       - save_cache:
           paths: [node_modules]
           key: deps-{{ checksum "yarn.lock" }}
@@ -83,7 +81,7 @@ jobs:
       - run:
           name: Build docker image
           command: |
-            tar -xf build.tar.gz
+            tar -xf build /tmp/build.tar.gz
             ls -la
             docker build -t limoli/capstone:$CIRCLE_BRANCH .
       - run:
