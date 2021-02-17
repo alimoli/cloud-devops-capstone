@@ -14,7 +14,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-${CIRCLE_WORKFLOW_ID}
+            - react-$CIRCLE_WORKFLOW_ID
       - run:
           name: Install yarn
           command: |
@@ -25,7 +25,7 @@ jobs:
             yarn install
       - save_cache:
           paths: [node_modules]
-          key: react-${CIRCLE_WORKFLOW_ID}
+          key: react-$CIRCLE_WORKFLOW_ID
 
   # Check code quality
   check:
@@ -35,7 +35,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-${CIRCLE_WORKFLOW_ID}
+            - react-$CIRCLE_WORKFLOW_ID
       - run:
           name: Lint code
           command: |
@@ -53,14 +53,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-${CIRCLE_WORKFLOW_ID}
+            - react-$CIRCLE_WORKFLOW_ID
       - run:
           name: Build react app
           command: |
             yarn build
       - save_cache:
           paths: [build]
-          key: react-build-${CIRCLE_WORKFLOW_ID}
+          key: react-build-$CIRCLE_WORKFLOW_ID
 
   # Dockerize react application
   dockerize:
@@ -69,7 +69,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - react-build-${CIRCLE_WORKFLOW_ID}
+            - react-build-$CIRCLE_WORKFLOW_ID
       - run:
           name: Login to the registry
           command: |
@@ -85,7 +85,7 @@ jobs:
             docker push limoli/capstone:$CIRCLE_BRANCH
       - save_cache:
           paths: [$HOME/.docker]
-          key: docker-${CIRCLE_WORKFLOW_ID}
+          key: docker-$CIRCLE_WORKFLOW_ID
 
   # Deploy to K8S cluster
   deploy:
@@ -99,7 +99,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - docker-${CIRCLE_WORKFLOW_ID}
+            - docker-$CIRCLE_WORKFLOW_ID
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
