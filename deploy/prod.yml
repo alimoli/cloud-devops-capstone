@@ -37,7 +37,7 @@ spec:
       targetPort: 80
   selector:
     app: react-app
-  type: LoadBalanceer
+  type: LoadBalancer
 
 # NodePort exposes the service on each node’s IP address at a static port.
 #kind: Service
