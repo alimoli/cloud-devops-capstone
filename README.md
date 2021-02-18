@@ -1,5 +1,9 @@
 # Capstone - Cloud DevOps
 
+Link: [github.com](https://github.com/alimoli/cloud-devops-capstone)
+
+Screenshots: (see `screenshots` folder)
+
 ## Set Up Pipeline
 
 #### Create Github repository with project code.
